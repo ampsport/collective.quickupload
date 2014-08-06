@@ -25,6 +25,7 @@ from collective.quickupload.interfaces import IQuickUploadFileUpdater
 from collective.quickupload.interfaces import IQuickUploadNotCapable
 from plone.i18n.normalizer.interfaces import IUserPreferredFileNameNormalizer
 from zope.component import getUtility
+from zope.container.interfaces import INameChooser
 from zope.i18n import translate
 from zope.schema import getFieldsInOrder
 from zope.security.interfaces import Unauthorized
@@ -688,14 +689,22 @@ class QuickUploadFile(QuickUploadAuthenticate):
             else:
                 can_overwrite = False
 
-            if not can_overwrite:
+            # TODO:
+            rename = True
+
+            if not can_overwrite and not rename:
                 logger.debug(
                     "The file id for %s already exists, upload rejected"
                     % file_name
                 )
                 return json.dumps({u'error': u'serverErrorAlreadyExists'})
-
-            overwritten_file = updated_object
+            elif rename:
+                overwritten_file = None
+                chooser = INameChooser(context)
+                newid = chooser.chooseName(file_name, context)
+                file_name = newid
+            else:
+                overwritten_file = updated_object
         else:
             overwritten_file = None
 
