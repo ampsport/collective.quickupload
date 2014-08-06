@@ -4,7 +4,9 @@ Changelog
 1.6.6 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Return JSON as application/json instead of text/html. IE > 8 properly
+  supports the correct mimetype.
+  [esteele]
 
 
 1.6.5 (2014-07-04)
